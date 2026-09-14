@@ -1,0 +1,33 @@
+[gd_scene load_steps=5 format=3 uid="uid://lighteater_ptl"]
+
+[ext_resource type="Script" path="res://scripts/enemies/LightEater.gd" id="1_le"]
+[ext_resource type="Script" path="res://scripts/components/HealthComponent.gd" id="2_health"]
+
+[sub_resource type="SphereMesh" id="Mesh_le"]
+radius = 0.32
+height = 0.64
+
+[sub_resource type="SphereShape3D" id="Shape_le"]
+radius = 0.32
+
+[sub_resource type="StandardMaterial3D" id="Mat_le"]
+albedo_color = Color(0.9, 0.15, 0.05, 1)
+emission_enabled = true
+emission = Color(1.0, 0.2, 0.0, 1)
+emission_energy_multiplier = 2.0
+
+[node name="LightEater" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 4
+script = ExtResource("1_le")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("Mesh_le")
+surface_material_override/0 = SubResource("Mat_le")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("Shape_le")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("2_health")
+max_health = 20.0

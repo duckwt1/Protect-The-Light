@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://dah1w3t05el7v"]
+
+[ext_resource type="Script" uid="uid://cq3fvvb1htlkv" path="res://scripts/zones/Zone1Generator.gd" id="1_gen"]
+[ext_resource type="Script" uid="uid://jspuvpi5pisq" path="res://scripts/zones/EnemySpawner.gd" id="2_spawner"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/ShadowCreeper.tscn" id="3_sc"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/LightEater.tscn" id="4_le"]
+[ext_resource type="PackedScene" path="res://scenes/zones/FuelPickup.tscn" id="5_fp"]
+[ext_resource type="PackedScene" path="res://scenes/zones/RestPoint.tscn" id="6_rp"]
+
+[sub_resource type="Environment" id="Env_mist"]
+background_mode = 1
+background_color = Color(0.03, 0.04, 0.06, 1)
+ambient_light_source = 1
+ambient_light_color = Color(0.06, 0.07, 0.1, 1)
+ambient_light_energy = 0.12
+tonemap_mode = 2
+fog_enabled = true
+fog_light_color = Color(0.08, 0.1, 0.14, 1)
+fog_density = 0.025
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.03
+
+[sub_resource type="NavigationMesh" id="NavMesh_1"]
+agent_height = 1.8
+agent_radius = 0.4
+
+[sub_resource type="SphereShape3D" id="Shape_dest"]
+radius = 3.0
+
+[node name="Zone1_MistForest" type="Node3D" unique_id=1185731031]
+script = ExtResource("1_gen")
+shadow_creeper_scene = ExtResource("3_sc")
+light_eater_scene = ExtResource("4_le")
+fuel_pickup_scene = ExtResource("5_fp")
+rest_point_scene = ExtResource("6_rp")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1642075271]
+environment = SubResource("Env_mist")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1620569811]
+transform = Transform3D(0.866, -0.354, 0.354, 0, 0.707, 0.707, -0.5, -0.612, 0.612, 0, 10, 0)
+light_color = Color(0.5, 0.55, 0.7, 1)
+light_energy = 0.08
+shadow_enabled = true
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=884223083]
+navigation_mesh = SubResource("NavMesh_1")
+
+[node name="Destination" type="Node3D" parent="." unique_id=1026351698]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -65)
+
+[node name="DestinationLight" type="OmniLight3D" parent="Destination" unique_id=1678624871]
+light_color = Color(0.35, 0.75, 1, 1)
+light_energy = 5.0
+shadow_enabled = true
+omni_range = 8.0
+
+[node name="DestinationArea" type="Area3D" parent="Destination" unique_id=781885120]
+collision_layer = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Destination/DestinationArea" unique_id=646541837]
+shape = SubResource("Shape_dest")
+
+[node name="EnemySpawner" type="Node3D" parent="." unique_id=566074742]
+script = ExtResource("2_spawner")
+shadow_creeper_scene = ExtResource("3_sc")
+light_eater_scene = ExtResource("4_le")

@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://b0h6mr0xvdr58"]
+
+[ext_resource type="PackedScene" path="res://scenes/player/Player.tscn" id="1_player"]
+[ext_resource type="PackedScene" uid="uid://dah1w3t05el7v" path="res://scenes/zones/Zone1_MistForest.tscn" id="2_zone1"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="3_hud"]
+
+[node name="Main" type="Node3D" unique_id=725126586]
+
+[node name="Zone1_MistForest" parent="." unique_id=1684331299 instance=ExtResource("2_zone1")]
+script = null
+
+[node name="Players" type="Node3D" parent="." unique_id=215504853]
+
+[node name="Player" parent="Players" unique_id=2099064377 instance=ExtResource("1_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="HUD" parent="." unique_id=614945320 instance=ExtResource("3_hud")]
