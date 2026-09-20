@@ -1,0 +1,27 @@
+[gd_scene load_steps=5 format=3 uid="uid://mud_area_ptl"]
+
+[ext_resource type="Script" path="res://scripts/zones/MudArea.gd" id="1_mud"]
+
+[sub_resource type="BoxShape3D" id="Shape_mud"]
+size = Vector3(12, 0.6, 12)
+
+[sub_resource type="BoxMesh" id="Mesh_mud"]
+size = Vector3(12, 0.1, 12)
+
+[sub_resource type="StandardMaterial3D" id="Mat_mud"]
+albedo_color = Color(0.18, 0.12, 0.07, 1)
+roughness = 0.95
+
+[node name="MudArea" type="Area3D"]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("1_mud")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+shape = SubResource("Shape_mud")
+
+[node name="VisualMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+mesh = SubResource("Mesh_mud")
+surface_material_override/0 = SubResource("Mat_mud")

@@ -77,3 +77,16 @@ func _on_server_disconnected() -> void:
 	print("Server disconnected")
 	players.clear()
 	server_disconnected.emit()
+
+
+@rpc("call_local", "reliable")
+func load_main_game() -> void:
+	get_tree().change_scene_to_file("res://scenes/Main.tscn")
+
+
+func start_game() -> void:
+	if multiplayer.has_multiplayer_peer() and multiplayer.is_server():
+		load_main_game.rpc()
+	else:
+		load_main_game()
+

@@ -1,32 +1,76 @@
-[gd_scene load_steps=5 format=3 uid="uid://lighteater_ptl"]
+[gd_scene load_steps=11 format=3 uid="uid://lighteater_ptl"]
 
 [ext_resource type="Script" path="res://scripts/enemies/LightEater.gd" id="1_le"]
 [ext_resource type="Script" path="res://scripts/components/HealthComponent.gd" id="2_health"]
 
-[sub_resource type="SphereMesh" id="Mesh_le"]
-radius = 0.32
-height = 0.64
-
 [sub_resource type="SphereShape3D" id="Shape_le"]
-radius = 0.32
+radius = 0.35
 
-[sub_resource type="StandardMaterial3D" id="Mat_le"]
-albedo_color = Color(0.9, 0.15, 0.05, 1)
+[sub_resource type="SphereMesh" id="Mesh_core"]
+radius = 0.22
+height = 0.44
+
+[sub_resource type="StandardMaterial3D" id="Mat_firecore"]
+albedo_color = Color(1.0, 0.2, 0.05, 1)
 emission_enabled = true
-emission = Color(1.0, 0.2, 0.0, 1)
-emission_energy_multiplier = 2.0
+emission = Color(1.0, 0.35, 0.05, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="BoxMesh" id="Mesh_wing"]
+size = Vector3(0.5, 0.02, 0.3)
+
+[sub_resource type="StandardMaterial3D" id="Mat_wing"]
+albedo_color = Color(0.4, 0.05, 0.02, 1)
+roughness = 0.5
+
+[sub_resource type="SphereMesh" id="Mesh_eye"]
+radius = 0.03
+height = 0.06
+
+[sub_resource type="StandardMaterial3D" id="Mat_eye"]
+albedo_color = Color(1, 1, 0.2, 1)
+emission_enabled = true
+emission = Color(1, 1, 0.2, 1)
+emission_energy_multiplier = 4.0
 
 [node name="LightEater" type="CharacterBody3D"]
 collision_layer = 2
 collision_mask = 4
 script = ExtResource("1_le")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("Mesh_le")
-surface_material_override/0 = SubResource("Mat_le")
-
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("Shape_le")
+
+[node name="VisualModel" type="Node3D" parent="."]
+
+[node name="CoreBody" type="MeshInstance3D" parent="VisualModel"]
+mesh = SubResource("Mesh_core")
+surface_material_override/0 = SubResource("Mat_firecore")
+
+[node name="WingL" type="MeshInstance3D" parent="VisualModel"]
+transform = Transform3D(0.9659, 0.2588, 0, -0.2588, 0.9659, 0, 0, 0, 1, -0.35, 0.05, 0)
+mesh = SubResource("Mesh_wing")
+surface_material_override/0 = SubResource("Mat_wing")
+
+[node name="WingR" type="MeshInstance3D" parent="VisualModel"]
+transform = Transform3D(0.9659, -0.2588, 0, 0.2588, 0.9659, 0, 0, 0, 1, 0.35, 0.05, 0)
+mesh = SubResource("Mesh_wing")
+surface_material_override/0 = SubResource("Mat_wing")
+
+[node name="EyeL" type="MeshInstance3D" parent="VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.08, 0.06, -0.18)
+mesh = SubResource("Mesh_eye")
+surface_material_override/0 = SubResource("Mat_eye")
+
+[node name="EyeR" type="MeshInstance3D" parent="VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.08, 0.06, -0.18)
+mesh = SubResource("Mesh_eye")
+surface_material_override/0 = SubResource("Mat_eye")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="VisualModel"]
+light_color = Color(1, 0.3, 0.05, 1)
+light_energy = 1.5
+omni_range = 3.0
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("2_health")

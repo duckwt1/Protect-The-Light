@@ -1,4 +1,4 @@
-﻿# Player.gd
+# Player.gd
 # CharacterBody3D root script.
 # Handles: movement, over-the-shoulder camera, torch-bearer/guardian roles,
 # zone damage (GDD §5), attack (LMB), torch-pass (hold E).
@@ -25,6 +25,8 @@ const ATTACK_REACH        := 2.5   # metres (raycast length)
 const PASS_HOLD_TIME      := 1.2   # s
 const PASS_RADIUS         := 1.5   # m
 
+signal torch_pass_progress(ratio: float)
+
 @onready var health: HealthComponent    = $HealthComponent
 @onready var torch: TorchComponent      = $TorchComponent
 @onready var camera_pivot: Node3D       = $CameraPivot
@@ -32,10 +34,12 @@ const PASS_RADIUS         := 1.5   # m
 @onready var camera: Camera3D           = $CameraPivot/SpringArm3D/Camera3D
 @onready var interaction_area: Area3D   = $InteractionArea
 @onready var torch_light: OmniLight3D   = $TorchLight
+@onready var halo_indicator: Node3D     = get_node_or_null("HaloIndicator")
 
 var is_torch_bearer: bool = false
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var mouse_sensitivity: float = 0.003
+var mud_slowdown_factor: float = 1.0
 
 # Zone state
 enum ZoneType { DARK, DANGER, SAFE }
@@ -111,7 +115,7 @@ func _physics_process(delta: float) -> void:
 	# WASD movement
 	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 	var direction  := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
-	var speed      := SPEED_BEARER if is_torch_bearer else SPEED_GUARDIAN
+	var speed      := (SPEED_BEARER if is_torch_bearer else SPEED_GUARDIAN) * mud_slowdown_factor
 
 	if direction.length_squared() > 0.0:
 		velocity.x = direction.x * speed
@@ -234,6 +238,7 @@ func _cancel_pass() -> void:
 	_pass_target = null
 	_pass_timer  = 0.0
 	_passing     = false
+	torch_pass_progress.emit(0.0)
 
 
 func _update_pass(delta: float) -> void:
@@ -246,6 +251,8 @@ func _update_pass(delta: float) -> void:
 		_cancel_pass()
 		return
 	_pass_timer += delta
+	var ratio := clampf(_pass_timer / PASS_HOLD_TIME, 0.0, 1.0)
+	torch_pass_progress.emit(ratio)
 	if _pass_timer >= PASS_HOLD_TIME:
 		_complete_pass()
 
@@ -263,6 +270,10 @@ func receive_torch() -> void:
 	set_as_torch_bearer(true)
 
 
+func set_mud_slowdown(factor: float) -> void:
+	mud_slowdown_factor = factor
+
+
 # ---------------------------------------------------------------------------
 # Role management
 # ---------------------------------------------------------------------------
@@ -272,6 +283,8 @@ func set_as_torch_bearer(active: bool) -> void:
 		torch.set_active(active)
 	if torch_light:
 		torch_light.visible = active
+	if halo_indicator:
+		halo_indicator.visible = active
 	if active:
 		health.max_health = 80.0
 	else:

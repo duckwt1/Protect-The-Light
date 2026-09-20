@@ -1,0 +1,91 @@
+[gd_scene load_steps=13 format=3 uid="uid://boss_area_ptl"]
+
+[ext_resource type="Script" path="res://scripts/zones/BossArea.gd" id="1_ba"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/ShadowCreeper.tscn" id="2_sc"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/PackRunner.tscn" id="3_pr"]
+
+[sub_resource type="NavigationMesh" id="NavMesh_boss"]
+agent_radius = 0.4
+agent_height = 1.8
+cell_size = 0.25
+
+[sub_resource type="CylinderMesh" id="Mesh_arena"]
+top_radius = 28.0
+bottom_radius = 28.0
+height = 1.0
+
+[sub_resource type="CylinderShape3D" id="Shape_arena"]
+radius = 28.0
+height = 1.0
+
+[sub_resource type="StandardMaterial3D" id="Mat_arena"]
+albedo_color = Color(0.15, 0.15, 0.18, 1)
+roughness = 0.7
+
+[sub_resource type="CylinderMesh" id="Mesh_altar"]
+top_radius = 4.0
+bottom_radius = 4.5
+height = 1.5
+
+[sub_resource type="StandardMaterial3D" id="Mat_altar"]
+albedo_color = Color(0.7, 0.65, 0.5, 1)
+emission_enabled = true
+emission = Color(0.4, 0.6, 0.8, 1)
+emission_energy_multiplier = 1.2
+
+[sub_resource type="SphereShape3D" id="Shape_victory"]
+radius = 3.5
+
+[sub_resource type="BoxShape3D" id="Shape_trigger"]
+size = Vector3(16, 4, 4)
+
+[node name="BossArea" type="Node3D"]
+script = ExtResource("1_ba")
+shadow_creeper_scene = ExtResource("2_sc")
+pack_runner_scene = ExtResource("3_pr")
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+navigation_mesh = SubResource("NavMesh_boss")
+
+[node name="ArenaFloor" type="StaticBody3D" parent="NavigationRegion3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+collision_layer = 4
+collision_mask = 3
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/ArenaFloor"]
+mesh = SubResource("Mesh_arena")
+surface_material_override/0 = SubResource("Mat_arena")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/ArenaFloor"]
+shape = SubResource("Shape_arena")
+
+[node name="FinalLightSanctuary" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="AltarMesh" type="MeshInstance3D" parent="FinalLightSanctuary"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+mesh = SubResource("Mesh_altar")
+surface_material_override/0 = SubResource("Mat_altar")
+
+[node name="FinalOmniLight" type="OmniLight3D" parent="FinalLightSanctuary"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+light_color = Color(0.4, 0.85, 1.0, 1)
+light_energy = 8.0
+omni_range = 18.0
+shadow_enabled = true
+
+[node name="VictoryArea" type="Area3D" parent="FinalLightSanctuary"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+collision_layer = 0
+collision_mask = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="FinalLightSanctuary/VictoryArea"]
+shape = SubResource("Shape_victory")
+
+[node name="ZoneTrigger" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 24)
+collision_layer = 0
+collision_mask = 1
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ZoneTrigger"]
+shape = SubResource("Shape_trigger")

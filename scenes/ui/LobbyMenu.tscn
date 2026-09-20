@@ -1,0 +1,92 @@
+[gd_scene load_steps=2 format=3 uid="uid://lobby_menu_ptl"]
+
+[ext_resource type="Script" path="res://scripts/ui/LobbyMenu.gd" id="1_lobby"]
+
+[node name="LobbyMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_lobby")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.04, 0.06, 1)
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -200.0
+offset_right = 220.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+theme_override_font_sizes/font_size = 42
+text = "PROTECT THE LIGHT"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.7, 0.75, 1)
+theme_override_font_sizes/font_size = 16
+text = "3D Co-op Survival Horror-lite"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="VBox"]
+layout_mode = 2
+
+[node name="SoloBtn" type="Button" parent="VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "SOLO EXPEDITION (OFFLINE)"
+
+[node name="HostBtn" type="Button" parent="VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "HOST EXPEDITION (TORCH BEARER)"
+
+[node name="HBoxJoin" type="HBoxContainer" parent="VBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="IpInput" type="LineEdit" parent="VBox/HBoxJoin"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "127.0.0.1"
+placeholder_text = "Server IP (e.g. 127.0.0.1)"
+
+[node name="JoinBtn" type="Button" parent="VBox/HBoxJoin"]
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+text = "JOIN GAME"
+
+[node name="StatusLabel" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.5, 1)
+text = "Select an expedition mode to begin."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="StartBtn" type="Button" parent="VBox"]
+visible = false
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.95, 0.3, 1)
+text = "START EXPEDITION"

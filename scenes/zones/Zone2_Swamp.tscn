@@ -1,0 +1,104 @@
+[gd_scene load_steps=13 format=3 uid="uid://zone2_swamp_ptl"]
+
+[ext_resource type="Script" path="res://scripts/zones/ZoneTrigger.gd" id="1_zt"]
+[ext_resource type="PackedScene" path="res://scenes/zones/MudArea.tscn" id="1_mud"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/DampLurker.tscn" id="2_dl"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/PackRunner.tscn" id="3_pr"]
+[ext_resource type="PackedScene" path="res://scenes/zones/FuelPickup.tscn" id="4_fp"]
+
+[sub_resource type="Environment" id="Env_swamp"]
+background_mode = 1
+background_color = Color(0.02, 0.05, 0.03, 1)
+ambient_light_source = 1
+ambient_light_color = Color(0.04, 0.08, 0.05, 1)
+ambient_light_energy = 0.1
+fog_enabled = true
+fog_light_color = Color(0.05, 0.1, 0.06, 1)
+fog_density = 0.04
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.06
+tonemap_mode = 2
+
+[sub_resource type="NavigationMesh" id="NavMesh_swamp"]
+agent_radius = 0.4
+agent_height = 1.8
+cell_size = 0.25
+
+[sub_resource type="BoxShape3D" id="Shape_ground"]
+size = Vector3(16, 1, 80)
+
+[sub_resource type="BoxMesh" id="Mesh_ground"]
+size = Vector3(16, 1, 80)
+
+[sub_resource type="StandardMaterial3D" id="Mat_ground"]
+albedo_color = Color(0.12, 0.16, 0.1, 1)
+roughness = 0.95
+
+[sub_resource type="BoxShape3D" id="Shape_trigger"]
+size = Vector3(18, 4, 4)
+
+[node name="Zone2_Swamp" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_swamp")
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+navigation_mesh = SubResource("NavMesh_swamp")
+
+[node name="Ground" type="StaticBody3D" parent="NavigationRegion3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -40)
+collision_layer = 4
+collision_mask = 3
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/Ground"]
+shape = SubResource("Shape_ground")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/Ground"]
+mesh = SubResource("Mesh_ground")
+surface_material_override/0 = SubResource("Mat_ground")
+
+[node name="MudArea1" parent="." instance=ExtResource("1_mud")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20)
+
+[node name="MudArea2" parent="." instance=ExtResource("1_mud")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -50)
+
+[node name="DampLurker1" parent="." instance=ExtResource("2_dl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -22)
+
+[node name="DampLurker2" parent="." instance=ExtResource("2_dl")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, -48)
+
+[node name="PackRunner1" parent="." instance=ExtResource("3_pr")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -32)
+pack_offset_angle = 0.0
+
+[node name="PackRunner2" parent="." instance=ExtResource("3_pr")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0, -34)
+pack_offset_angle = -45.0
+
+[node name="PackRunner3" parent="." instance=ExtResource("3_pr")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, -34)
+pack_offset_angle = 45.0
+
+[node name="FuelPickup1" parent="." instance=ExtResource("4_fp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.3, -15)
+
+[node name="FuelPickup2" parent="." instance=ExtResource("4_fp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.3, -30)
+
+[node name="FuelPickup3" parent="." instance=ExtResource("4_fp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0.3, -42)
+
+[node name="FuelPickup4" parent="." instance=ExtResource("4_fp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 0.3, -60)
+
+[node name="ZoneTrigger" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -5)
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("1_zt")
+target_zone_id = 3
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ZoneTrigger"]
+shape = SubResource("Shape_trigger")

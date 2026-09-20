@@ -1,0 +1,109 @@
+[gd_scene load_steps=12 format=3 uid="uid://packrunner_ptl"]
+
+[ext_resource type="Script" path="res://scripts/enemies/PackRunner.gd" id="1_pr"]
+[ext_resource type="Script" path="res://scripts/components/HealthComponent.gd" id="2_health"]
+
+[sub_resource type="BoxShape3D" id="Shape_pr"]
+size = Vector3(0.5, 0.8, 1.2)
+
+[sub_resource type="BoxMesh" id="Mesh_body"]
+size = Vector3(0.38, 0.45, 0.85)
+
+[sub_resource type="StandardMaterial3D" id="Mat_hound"]
+albedo_color = Color(0.2, 0.1, 0.06, 1)
+roughness = 0.8
+
+[sub_resource type="BoxMesh" id="Mesh_head"]
+size = Vector3(0.28, 0.28, 0.38)
+
+[sub_resource type="SphereMesh" id="Mesh_eye"]
+radius = 0.035
+height = 0.07
+
+[sub_resource type="StandardMaterial3D" id="Mat_eye"]
+albedo_color = Color(1, 0.2, 0.1, 1)
+emission_enabled = true
+emission = Color(1, 0.2, 0.1, 1)
+emission_energy_multiplier = 4.0
+
+[sub_resource type="CylinderMesh" id="Mesh_leg"]
+top_radius = 0.05
+bottom_radius = 0.04
+height = 0.5
+
+[sub_resource type="BoxMesh" id="Mesh_tail"]
+size = Vector3(0.08, 0.08, 0.45)
+
+[sub_resource type="SphereShape3D" id="Shape_detect"]
+radius = 14.0
+
+[node name="PackRunner" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 4
+script = ExtResource("1_pr")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+shape = SubResource("Shape_pr")
+
+[node name="VisualModel" type="Node3D" parent="."]
+
+[node name="Torso" type="MeshInstance3D" parent="VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+mesh = SubResource("Mesh_body")
+surface_material_override/0 = SubResource("Mat_hound")
+
+[node name="Head" type="MeshInstance3D" parent="VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 0.9659, 0.2588, 0, -0.2588, 0.9659, 0, 0.58, -0.45)
+mesh = SubResource("Mesh_head")
+surface_material_override/0 = SubResource("Mat_hound")
+
+[node name="EyeL" type="MeshInstance3D" parent="VisualModel/Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.09, 0.06, -0.15)
+mesh = SubResource("Mesh_eye")
+surface_material_override/0 = SubResource("Mat_eye")
+
+[node name="EyeR" type="MeshInstance3D" parent="VisualModel/Head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.09, 0.06, -0.15)
+mesh = SubResource("Mesh_eye")
+surface_material_override/0 = SubResource("Mat_eye")
+
+[node name="LegFL" type="MeshInstance3D" parent="VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0.25, -0.3)
+mesh = SubResource("Mesh_leg")
+surface_material_override/0 = SubResource("Mat_hound")
+
+[node name="LegFR" type="MeshInstance3D" parent="VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0.25, -0.3)
+mesh = SubResource("Mesh_leg")
+surface_material_override/0 = SubResource("Mat_hound")
+
+[node name="LegBL" type="MeshInstance3D" parent="VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.15, 0.25, 0.3)
+mesh = SubResource("Mesh_leg")
+surface_material_override/0 = SubResource("Mat_hound")
+
+[node name="LegBR" type="MeshInstance3D" parent="VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.15, 0.25, 0.3)
+mesh = SubResource("Mesh_leg")
+surface_material_override/0 = SubResource("Mat_hound")
+
+[node name="Tail" type="MeshInstance3D" parent="VisualModel"]
+transform = Transform3D(1, 0, 0, 0, 0.866, 0.5, 0, -0.5, 0.866, 0, 0.45, 0.55)
+mesh = SubResource("Mesh_tail")
+surface_material_override/0 = SubResource("Mat_hound")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+path_desired_distance = 0.5
+target_desired_distance = 0.8
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("2_health")
+max_health = 18.0
+
+[node name="LightDetectionArea" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LightDetectionArea"]
+shape = SubResource("Shape_detect")

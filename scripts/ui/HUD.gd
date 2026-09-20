@@ -1,13 +1,17 @@
 # HUD.gd
-# Overlay UI: HP, Torch durability, zone label, warning vignette,
-# Game Over / Victory panels, and guardian countdown.
+# Overlay UI: HP, Torch durability, zone label, journey %, warning vignette,
+# interaction bar, and Game Over / Victory panels.
 extends CanvasLayer
 
 @onready var health_bar: ProgressBar  = $BottomLeft/HealthBar
 @onready var torch_bar: ProgressBar   = $BottomLeft/TorchBar
+@onready var alive_label: Label       = $BottomLeft/AliveLabel
 @onready var bearer_label: Label      = $BearerLabel
 @onready var zone_label: Label        = $ZoneLabel
 @onready var vignette: ColorRect      = $WarningVignette
+@onready var interact_container: VBoxContainer = $InteractionContainer
+@onready var interact_bar: ProgressBar         = $InteractionContainer/InteractionBar
+@onready var interact_label: Label             = $InteractionContainer/InteractionLabel
 @onready var game_over_panel: Panel   = $GameOverPanel
 @onready var game_over_reason: Label  = $GameOverPanel/VBox/Reason
 @onready var victory_panel: Panel     = $VictoryPanel
@@ -16,17 +20,20 @@ extends CanvasLayer
 var _vignette_dir: float = 1.0
 var _local_player: Node3D = null
 
-
 func _ready() -> void:
 	game_over_panel.visible = false
 	victory_panel.visible   = false
 	countdown_label.visible = false
 	vignette.visible        = false
+	interact_container.visible = false
 
 	GameManager.game_state_changed.connect(_on_state_changed)
 	GameManager.guardian_countdown_tick.connect(_on_countdown)
 
-	# Connect buttons
+	if WorldProgression:
+		WorldProgression.zone_changed.connect(_on_zone_changed)
+		_update_zone_ui(WorldProgression.current_zone_name, WorldProgression.current_progress)
+
 	if $GameOverPanel/VBox/RestartBtn:
 		$GameOverPanel/VBox/RestartBtn.pressed.connect(
 			func(): get_tree().reload_current_scene()
@@ -36,13 +43,10 @@ func _ready() -> void:
 			func(): get_tree().reload_current_scene()
 		)
 
-	# Find local player after a frame (so they've been added)
 	await get_tree().process_frame
 	_find_player()
 
-
 func _process(delta: float) -> void:
-	# Update bars from local player
 	if not is_instance_valid(_local_player):
 		_find_player()
 		return
@@ -63,29 +67,47 @@ func _process(delta: float) -> void:
 			torch_bar.value     = tc.current_durability
 			_update_vignette(tc.get_ratio(), delta)
 
-	# Zone label
-	if _local_player.has_method("_calc_zone"):
-		pass  # could show zone text
+	# Update alive count
+	var alive_count := 0
+	for id in GameManager.all_players:
+		var p = GameManager.all_players[id]
+		if is_instance_valid(p):
+			var phc := p.get_node_or_null("HealthComponent") as HealthComponent
+			if phc and phc.is_alive():
+				alive_count += 1
+	alive_label.text = "Survivors: %d" % alive_count
 
+func _on_pass_progress(ratio: float) -> void:
+	if ratio > 0.0:
+		interact_container.visible = true
+		interact_label.text = "Transferring Torch: %d%%" % int(ratio * 100)
+		interact_bar.value = ratio
+	else:
+		interact_container.visible = false
 
 func _update_vignette(ratio: float, delta: float) -> void:
 	if ratio < 0.3:
 		vignette.visible = true
-		# Pulse between 0 and 0.25 alpha
-		_vignette_dir = 1.0 if vignette.color.a <= 0.0 else (-1.0 if vignette.color.a >= 0.25 else _vignette_dir)
-		var new_alpha := vignette.color.a + _vignette_dir * delta * 0.8
-		vignette.color = Color(0.8, 0.0, 0.0, clampf(new_alpha, 0.0, 0.25))
+		_vignette_dir = 1.0 if vignette.color.a <= 0.0 else (-1.0 if vignette.color.a >= 0.28 else _vignette_dir)
+		var new_alpha := vignette.color.a + _vignette_dir * delta * 0.9
+		vignette.color = Color(0.85, 0.0, 0.0, clampf(new_alpha, 0.0, 0.28))
 	else:
 		vignette.visible = false
 
-
 func _find_player() -> void:
 	for id in GameManager.all_players:
-		var p = GameManager.all_players[id]   # Dictionary returns Variant, no := inference
+		var p = GameManager.all_players[id]
 		if is_instance_valid(p):
 			_local_player = p
+			if _local_player.has_signal("torch_pass_progress") and not _local_player.torch_pass_progress.is_connected(_on_pass_progress):
+				_local_player.torch_pass_progress.connect(_on_pass_progress)
 			break
 
+func _on_zone_changed(_zone_id: int, zone_name: String, progress_pct: float) -> void:
+	_update_zone_ui(zone_name, progress_pct)
+
+func _update_zone_ui(zone_name: String, progress_pct: float) -> void:
+	zone_label.text = "%s  |  Journey: %d%%" % [zone_name, int(progress_pct)]
 
 func _on_state_changed(state: GameManager.GameState) -> void:
 	match state:
@@ -95,7 +117,6 @@ func _on_state_changed(state: GameManager.GameState) -> void:
 		GameManager.GameState.VICTORY:
 			victory_panel.visible = true
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-
 
 func _on_countdown(seconds: float) -> void:
 	countdown_label.visible = true
